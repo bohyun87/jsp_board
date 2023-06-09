@@ -36,7 +36,7 @@
 				<!-- boardList 에 담아서 가져왔기 때문에 하나씩 풀어줘야 한다. ↓ -->
 				<tr>
 					<td>${board.board_no}</td>
-					<td class="title">${board.title}</td>
+					<td class="title"><a href="./view?board_no=${board.board_no}">${board.title}</a></td>
 					<td>${board.user_id}</td>
 					<td>${board.reg_date}</td>
 					<td>${board.views}</td>
