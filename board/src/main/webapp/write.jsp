@@ -46,8 +46,14 @@
         </div>
       </div>
     </div>
-    
-    <script type="text/javascript" src="./script.js"></script>
+	 
+    <!-- <script>
+		<c:if test="${error != null}">
+ 		alert("${error}");
+		</c:if>
+	</script> -->
+	<!-- redirect:/list?error= => list 로 받아서 에러메세지 띄어주고 list 로 넘겨주기 때문에 write 는 필요 없음 -->
 
+    <script type="text/javascript" src="./script.js"></script>
 </body>
 </html>

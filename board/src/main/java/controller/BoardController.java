@@ -1,7 +1,9 @@
  package controller;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -97,10 +99,11 @@ public class BoardController extends HttpServlet {
 		try {  //BoardDAO.java 에서 throws 했기 때문에 불러온 곳에서 다시 예외발생함 => try/catch문으로 받음
 			list = dao.getList();
 			request.setAttribute("boardList", list);   //(key, value)
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-		}
-		
+			ctx.log("게시판 목록 생성 과정에서 문제 발생");   //사용자 보다는 개발자가 확인하기 위함
+			request.setAttribute("error", "게시판 목록이 정상적으로 처리되지 않았습니다.");  //사용자에게 보여주는 에러 메세지
+		}		
 		return "index.jsp";
 	}
 	
@@ -113,6 +116,8 @@ public class BoardController extends HttpServlet {
 			request.setAttribute("board", b);
 		} catch (Exception e) {
 			e.printStackTrace();
+			ctx.log("게시판 가져오는 과정에서 문제 발생");   //사용자 보다는 개발자가 확인하기 위함
+			request.setAttribute("error", "게시판 정상적으로 가져오지 못했습니다.");  //사용자에게 보여주는 에러 메세지
 		}		
 		return "view.jsp";		
 	}
@@ -152,6 +157,16 @@ public class BoardController extends HttpServlet {
 			
 		} catch (Exception e) {
 			e.printStackTrace();
+			ctx.log("게시판 작성과정에서 문제 발생");   //사용자 보다는 개발자가 확인하기 위함
+
+			//사용자에게 보여주는 에러 메세지
+			try {                  // redirect 이기 때문에 get 방식으로 에러 넘겨주기      // get 방식으로 넘길 한글깨짐 방지
+				String encodeName = URLEncoder.encode("게시물이 정상적으로 등록되지 않았습니다.", "UTF-8");
+				return "redirect:/list?error=" + encodeName;   // 주소에 get 방식으로 에러메세지 띄우기
+				
+			} catch (UnsupportedEncodingException e1) {
+				e1.printStackTrace();
+			}
 		}		
 		return "redirect:/list";
 	}
@@ -162,7 +177,7 @@ public class BoardController extends HttpServlet {
 		String header = part.getHeader("content-disposition");
 		System.out.println("header =>" + header);
 		
-		int start = header.indexOf("filename=");  //indexOf (fileName=) 로 시작하는 
+		int start = header.indexOf("filename=");  //indexOf (filename=) 로 시작하는 
 		fileName = header.substring(start + 10, header.length() - 1);  //substring => 글자를 잘라줌
 		System.out.println("파일명: " + fileName);	
 		
@@ -175,8 +190,10 @@ public class BoardController extends HttpServlet {
 		try {
 			Board b = dao.getViewForEdit(board_no);   //getViewForEdit 에서 데이터 가져오기
 			request.setAttribute("board", b);   //request 에 담아주기
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
+			ctx.log("게시판 가져오는 과정에서 문제 발생");   //사용자 보다는 개발자가 확인하기 위함
+			request.setAttribute("error", "게시판 정상적으로 가져오지 못했습니다.");  //사용자에게 보여주는 에러 메세지
 		} 
 		
 		return "edit.jsp";
@@ -202,6 +219,16 @@ public class BoardController extends HttpServlet {
 			
 		} catch (Exception e) {
 			e.printStackTrace();
+			ctx.log("게시판 수정과정에서 문제 발생");   //사용자 보다는 개발자가 확인하기 위함
+
+			//사용자에게 보여주는 에러 메세지
+			try {                  // redirect 이기 때문에 get 방식으로 에러 넘겨주기      // get 방식으로 넘길 한글깨짐 방지
+				String encodeName = URLEncoder.encode("게시물이 정상적으로 수정되지 않았습니다.", "UTF-8");
+				return "redirect:/view?board_no=" + b.getBoard_no() + "&error=" + encodeName;   // 주소에 get 방식으로 에러메세지 띄우기
+				
+			} catch (UnsupportedEncodingException e1) {
+				e1.printStackTrace();
+			}
 		}
 		
 		return "redirect:/view?board_no=" + b.getBoard_no();  
@@ -215,6 +242,16 @@ public class BoardController extends HttpServlet {
 			dao.deleteBoard(board_no);
 		} catch (Exception e) {
 			e.printStackTrace();
+			ctx.log("게시판 삭제과정에서 문제 발생");   //사용자 보다는 개발자가 확인하기 위함
+
+			//사용자에게 보여주는 에러 메세지
+			try {                  // redirect 이기 때문에 get 방식으로 에러 넘겨주기      // get 방식으로 넘길 한글깨짐 방지
+				String encodeName = URLEncoder.encode("게시물이 정상적으로 삭제되지 않았습니다.", "UTF-8");
+				return "redirect:/list?error=" + encodeName;   // 주소에 get 방식으로 에러메세지 띄우기
+				
+			} catch (UnsupportedEncodingException e1) {
+				e1.printStackTrace();
+			}
 		}
 		
 		return "redirect:/list";
